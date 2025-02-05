@@ -34,7 +34,7 @@
 
 ---
 
-## **YAML Indentation Rules**
+## YAML Indentation Rules
 1. **Use spaces, not tabs.** (Recommended: **2 or 4 spaces** per level)
 2. **Each key-value pair must be properly aligned.**
 3. **List items must start with `-`** (e.g., `- name:`).
