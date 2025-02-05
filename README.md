@@ -169,10 +169,223 @@ Used to manage users.
 
 ---
 
-## **🔹 Key Takeaways**
-✅ `state:` defines the **desired state** of a resource.  
-✅ **Different modules** support different `state:` values.  
-✅ **Common states:** `present`, `absent`, `latest`, `started`, `stopped`, etc.  
-✅ **Idempotency:** Ansible will only make changes if the state **does not match** the current system state.  
+------------
 
-Would you like a hands-on **practice task** using `state:`? 🚀
+
+
+## **The `debug` Module in Ansible**
+
+The **`debug`** module in Ansible is primarily used for **displaying information** during playbook execution. It's very helpful for **troubleshooting** and **logging values** of variables, output of commands, or specific states of your system.
+
+### **Key Purpose:**
+
+-   **Display output**: Print out the values of variables or results.
+-   **Conditional debugging**: Print output only under certain conditions.
+-   **Error handling**: To display error messages or intermediate results during playbook execution.
+
+----------
+
+### **Syntax of the `debug` Module**
+
+```yaml
+- name: Example task
+  debug:
+    msg: "Hello, world!"
+
+```
+
+----------
+
+### **Key Parameters:**
+
+1.  **`msg:`**
+    
+    -   This parameter is used to print a **message**.
+    -   You can use this to display **static** or **dynamic messages** (like variables or facts).
+    
+    **Example:**
+    
+    ```yaml
+    - name: Display a message
+      debug:
+        msg: "This is a custom message!"
+    
+    ```
+    
+2.  **`var:`**
+    
+    -   Prints the **value of a variable** (e.g., `var: variable_name`).
+    -   This is useful for debugging the values of variables or facts you’re working with.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Show the value of a variable
+      debug:
+        var: my_var
+    
+    ```
+    
+    If `my_var` contains `hello`, the output will be:
+    
+    ```
+    my_var: hello
+    
+    ```
+    
+3.  **`verbosity:`**
+    
+    -   Allows you to control the **level of verbosity** of the output.
+    -   The value of `verbosity` can be set to `0`, `1`, `2`, or `3`, controlling when the debug message will be shown based on the verbosity level during playbook execution.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Show detailed information
+      debug:
+        msg: "This will show only on higher verbosity levels."
+        verbosity: 2
+    
+    ```
+    
+4.  **`failed_when:`**
+    
+    -   This is useful to define a condition that will cause the task to fail, which is often used for debugging a particular condition or issue.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Show a message when a condition is met
+      debug:
+        msg: "This condition failed!"
+      failed_when: my_var != "expected_value"
+    
+    ```
+    
+
+----------
+
+### **Common Use Cases for the `debug` Module**
+
+1.  **Displaying Variables During Execution:** It’s common to use `debug` to output the values of variables at various points in your playbook to ensure the correct values are being passed along.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Display a variable for debugging
+      debug:
+        var: ansible_facts
+    
+    ```
+    
+2.  **Conditional Debugging:** Sometimes you might want to only display debug messages when certain conditions are met.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Debug only if a variable is set
+      debug:
+        msg: "The variable my_var is defined!"
+      when: my_var is defined
+    
+    ```
+    
+3.  **Print the Result of a Task:** You can use `debug` to print the results of tasks, such as the output of a command or the result of a lookup.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Get disk usage
+      command: df -h
+      register: disk_usage
+    
+    - name: Debug disk usage output
+      debug:
+        var: disk_usage.stdout
+    
+    ```
+    
+4.  **Error Handling with `fail` and `debug`:** Use `debug` along with the `fail` module to output error messages before deliberately failing a task.
+    
+    **Example:**
+    
+    ```yaml
+    - name: Check if a file exists
+      stat:
+        path: /tmp/myfile.txt
+      register: file_stat
+    
+    - name: Display error if the file doesn't exist
+      debug:
+        msg: "The file does not exist!"
+      when: not file_stat.stat.exists
+    
+    - name: Fail if the file doesn't exist
+      fail:
+        msg: "File not found!"
+      when: not file_stat.stat.exists
+    
+    ```
+    
+
+----------
+
+### **Example Playbook Using `debug`:**
+
+```yaml
+---
+- name: Ansible Debug Example
+  hosts: localhost
+  vars:
+    my_var: "Hello, Ansible!"
+    my_list:
+      - item1
+      - item2
+      - item3
+  tasks:
+    - name: Display a simple message
+      debug:
+        msg: "This is a custom debug message."
+
+    - name: Display a variable using `var`
+      debug:
+        var: my_var
+
+    - name: Display the list content
+      debug:
+        var: my_list
+
+    - name: Conditional debugging
+      debug:
+        msg: "This will only show if the variable my_var is defined!"
+      when: my_var is defined
+
+```
+
+----------
+
+### **Sample Output:**
+
+```yaml
+TASK [Display a simple message] ***
+ok: [localhost] => (item=None) =>
+  msg: This is a custom debug message.
+
+TASK [Display a variable using `var`] ***
+ok: [localhost] => (item=None) =>
+  my_var: Hello, Ansible!
+
+TASK [Display the list content] ***
+ok: [localhost] => (item=None) =>
+  my_list:
+  - item1
+  - item2
+  - item3
+
+TASK [Conditional debugging] ***
+ok: [localhost] => (item=None) =>
+  msg: This will only show if the variable my_var is defined!
+
+```
+
+----------
