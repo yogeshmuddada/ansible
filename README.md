@@ -20,7 +20,7 @@
         state: touch
 ```
 
-### ** Breakdown of the Syntax**
+### Breakdown of the Syntax
 | Component   | Description |
 |-------------|------------|
 | `- name:`  | Name of the playbook (Optional but recommended) |
